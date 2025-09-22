@@ -284,7 +284,7 @@ export default function DashboardPage() {
             {renderWishlist(myCurrentItems)}
           </div>
           <div>
-            <h2 className="text-2xl font-bold mb-4 pt-4">{partnerName}'s Wishlist</h2>
+            <h2 className="text-2xl font-bold mb-4 pt-4">{partnerName}&#39;s Wishlist</h2>
             {renderWishlist(partnerCurrentItems)}
           </div>
         </>
@@ -355,7 +355,7 @@ export default function DashboardPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="my-wishlist">My Wishlist</SelectItem>
-                    <SelectItem value="partner-wishlist">{partnerName}&apos;s Wishlist</SelectItem>
+                    <SelectItem value="partner-wishlist">{partnerName}&#39;s Wishlist</SelectItem>
                     <SelectItem value="reserved">Reserved By You</SelectItem>
                     <SelectItem value="history">Gift History</SelectItem>
                     <SelectItem value="all">All Items</SelectItem>
