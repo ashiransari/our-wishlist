@@ -367,7 +367,7 @@ export default function DashboardPage() {
               <Tabs defaultValue="my-wishlist" className="hidden md:block w-full" onValueChange={setActiveTab} value={activeTab}>
                 <TabsList className="grid w-full grid-cols-5">
                   <TabsTrigger value="my-wishlist">My Wishlist</TabsTrigger>
-                  <TabsTrigger value="partner-wishlist">{partnerName}'s Wishlist</TabsTrigger>
+                  <TabsTrigger value="partner-wishlist">{partnerName};s Wishlist</TabsTrigger>
                   <TabsTrigger value="reserved">Reserved By You</TabsTrigger>
                   <TabsTrigger value="history">Gift History</TabsTrigger>
                   <TabsTrigger value="all">All</TabsTrigger>
