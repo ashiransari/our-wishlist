@@ -3,21 +3,22 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { auth, db } from '../../lib/firebase/config';
 import { signOut, User } from 'firebase/auth';
 import { collection, addDoc, query, where, onSnapshot, doc, deleteDoc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+
 import Link from 'next/link';
-import { Plus, ChevronsUpDown, Pencil, Trash2, X } from 'lucide-react';
+import Image from 'next/image';
+import { Plus, ChevronsUpDown, X } from 'lucide-react';
 
 // Type Definitions
 type WishlistItem = {
@@ -228,6 +229,9 @@ export default function DashboardPage() {
   };
   const handleCloseImageModal = () => setImageModalUrl(null);
 
+  const editItemTitle = "Edit Item";
+  const addItemTitle = "Add to Your Wishlist";
+
   const renderWishlist = (items: WishlistItem[]) => (
      <div className="pt-4">
       {items.length > 0 ? (
@@ -239,8 +243,7 @@ export default function DashboardPage() {
             return (
               <Card key={item.id} className={`flex flex-col justify-between transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-lg ${isReservedByMe ? 'border-green-500 border-2' : ''} ${item.isPurchased ? 'opacity-60' : ''}`}>
                 <div>
-                  {item.imageUrl && <img src={item.imageUrl} alt={item.name} className="w-full h-48 object-cover rounded-t-lg cursor-pointer" onClick={() => handleOpenImageModal(item.imageUrl!)}/>}
-                  <CardHeader>
+                  {item.imageUrl && <Image src={item.imageUrl} alt={item.name} width={192} height={192} className="w-full h-48 object-cover rounded-t-lg cursor-pointer" onClick={() => handleOpenImageModal(item.imageUrl!)}/>}                   <CardHeader>
                     <div className="flex justify-between items-start"> <CardTitle>{item.name}</CardTitle> {item.priority && <span className={`px-2 py-1 text-xs font-bold text-white rounded-full ${getPriorityBadgeColor(item.priority)}`}>{item.priority}</span>} </div>
                     {typeof item.price === 'number' && <p className="font-semibold text-lg">₹{item.price.toLocaleString()}</p>}
                   </CardHeader>
@@ -281,7 +284,7 @@ export default function DashboardPage() {
             {renderWishlist(myCurrentItems)}
           </div>
           <div>
-            <h2 className="text-2xl font-bold mb-4 pt-4">{partnerName}'s Wishlist</h2>
+            <h2 className="text-2xl font-bold mb-4 pt-4">{partnerName}&apos;s Wishlist</h2>
             {renderWishlist(partnerCurrentItems)}
           </div>
         </>
@@ -383,7 +386,7 @@ export default function DashboardPage() {
           </DialogTrigger>
           
           <DialogContent>
-              <DialogHeader><DialogTitle>{editingItem ? 'Edit Item' : 'Add to Your Wishlist'}</DialogTitle></DialogHeader>
+              <DialogHeader><DialogTitle>{editingItem ? editItemTitle : addItemTitle}</DialogTitle></DialogHeader>
               <div className="grid gap-4 py-4">
                 <div><Label>Name*</Label><Input value={itemName} onChange={(e) => setItemName(e.target.value)} placeholder="Item Name"/></div>
                 <div><Label>Price (₹)*</Label><Input value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} type="number" placeholder="e.g., 1500"/></div>
@@ -416,7 +419,7 @@ export default function DashboardPage() {
       {imageModalUrl && (
         <Dialog open={!!imageModalUrl} onOpenChange={(open) => !open && handleCloseImageModal()}>
           <DialogContent className="w-screen h-screen max-w-none max-h-none p-4 bg-transparent border-none flex items-center justify-center">
-            <img src={imageModalUrl} alt="Wishlist Item" className="object-contain rounded-lg" />
+            <Image src={imageModalUrl} alt="Wishlist Item" fill className="object-contain rounded-lg" />
             <DialogClose asChild>
               <Button
                 variant="ghost"

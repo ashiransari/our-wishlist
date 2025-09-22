@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { auth, db } from '../lib/firebase/config';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+
+import { FirebaseError } from 'firebase/app';
 import { doc, setDoc } from 'firebase/firestore';
 
 export default function Home() {
@@ -31,24 +33,34 @@ export default function Home() {
           email: user.email
         });
         toast.success("Account created successfully! Welcome.");
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Error creating user:", error);
-        toast.error("Error creating account.", { description: error.message });
+        if (error instanceof FirebaseError) {
+          toast.error("Error creating account.", { description: error.message });
+        } else {
+          toast.error("Error creating account.", { description: "An unknown error occurred." });
+        }
       }
     } else {
       // Handle Sign In
       try {
         await signInWithEmailAndPassword(auth, email, password);
         toast.success("Welcome back!");
-      } catch (error: any) {
+      } catch (error: unknown) {
         console.error("Error signing in:", error);
-        if (error.code === 'auth/invalid-credential') {
-          toast.error("Login Failed", {
-            description: "The email or password you entered is incorrect. Please double-check your credentials and try again.",
-          });
+        if (error instanceof FirebaseError) {
+          if (error.code === 'auth/invalid-credential') {
+            toast.error("Login Failed", {
+              description: "The email or password you entered is incorrect. Please double-check your credentials and try again.",
+            });
+          } else {
+            toast.error("Login Failed", {
+              description: "An unexpected error occurred. Please try again later.",
+            });
+          }
         } else {
           toast.error("Login Failed", {
-            description: "An unexpected error occurred. Please try again later.",
+            description: "An unknown error occurred. Please try again later.",
           });
         }
       }
