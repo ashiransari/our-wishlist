@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Our Wishlist",
   description: "A shared wishlist for couples",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({
