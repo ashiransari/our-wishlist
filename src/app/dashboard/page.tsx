@@ -18,7 +18,7 @@ import { collection, addDoc, query, where, onSnapshot, doc, deleteDoc, getDoc, u
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Plus, ChevronsUpDown, X } from 'lucide-react';
+import { Plus, ChevronsUpDown, X, LogOut } from 'lucide-react';
 
 // Type Definitions
 type WishlistItem = {
@@ -313,7 +313,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center p-4 sm:p-8 bg-slate-50 dark:bg-slate-950">
-       <header className="w-full max-w-5xl flex justify-between items-center py-4 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 bg-slate-50 dark:bg-slate-950"><h1 className="text-3xl font-bold">Our Wishlist</h1><Button variant="outline" onClick={handleSignOut}>Sign Out</Button></header>
+       <header className="w-full max-w-5xl flex justify-between items-center py-4 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 bg-slate-50 dark:bg-slate-950"><h1 className="text-3xl font-bold">Our Wishlist</h1><Button variant="ghost" size="icon" onClick={handleSignOut}><LogOut className="h-6 w-6" /></Button></header>
        
        <main className="w-full max-w-5xl mt-8">
         <Dialog open={isDialogOpen} onOpenChange={(open) => { if (!open) resetForm(); setIsDialogOpen(open); }}>
