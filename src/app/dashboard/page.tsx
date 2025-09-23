@@ -244,12 +244,22 @@ export default function DashboardPage() {
               <Card key={item.id} className={`flex flex-col justify-between transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-lg ${isReservedByMe ? 'border-green-500 border-2' : ''} ${item.isPurchased ? 'opacity-60' : ''}`}>
                 <div>
                   {item.imageUrl && <Image src={item.imageUrl} alt={item.name} width={192} height={192} className="w-full h-48 object-cover rounded-t-lg cursor-pointer" onClick={() => handleOpenImageModal(item.imageUrl!)}/>}                   <CardHeader className="pt-4">
-                    <div className="flex justify-between items-start"> <CardTitle>{item.name}</CardTitle> {item.priority && <span className={`px-2 py-1 text-xs font-bold text-white rounded-full ${getPriorityBadgeColor(item.priority)}`}>{item.priority}</span>} </div>
+                    <div className="flex justify-between items-start"> 
+                      <CardTitle>
+                        {formattedLink ? (
+                          <a href={formattedLink} target="_blank" rel="noopener noreferrer" className="underline">
+                            {item.name}
+                          </a>
+                        ) : (
+                          item.name
+                        )}
+                      </CardTitle> 
+                      {item.priority && <span className={`px-2 py-1 text-xs font-bold text-white rounded-full ${getPriorityBadgeColor(item.priority)}`}>{item.priority}</span>} 
+                    </div>
                     {typeof item.price === 'number' && <p className="font-semibold text-lg">₹{item.price.toLocaleString()}</p>}
                   </CardHeader>
                   <CardContent>
                     {item.notes && <p className="text-sm text-gray-600 dark:text-gray-300">{item.notes}</p>}
-                    {formattedLink && <a href={formattedLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline text-xs block mt-2">View Product</a>}
                     {item.isPurchased && <p className="text-xs text-green-600 mt-2 font-bold">Purchased!</p>}
                   </CardContent>
                 </div>
