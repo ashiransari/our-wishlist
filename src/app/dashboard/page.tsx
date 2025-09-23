@@ -243,7 +243,7 @@ export default function DashboardPage() {
             return (
               <Card key={item.id} className={`flex flex-col justify-between transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-lg ${isReservedByMe ? 'border-green-500 border-2' : ''} ${item.isPurchased ? 'opacity-60' : ''}`}>
                 <div>
-                  {item.imageUrl && <Image src={item.imageUrl} alt={item.name} width={192} height={192} className="w-full h-48 object-cover rounded-t-lg cursor-pointer" onClick={() => handleOpenImageModal(item.imageUrl!)}/>}                   <CardHeader>
+                  {item.imageUrl && <Image src={item.imageUrl} alt={item.name} width={192} height={192} className="w-full h-48 object-cover rounded-t-lg cursor-pointer" onClick={() => handleOpenImageModal(item.imageUrl!)}/>}                   <CardHeader className="pt-4">
                     <div className="flex justify-between items-start"> <CardTitle>{item.name}</CardTitle> {item.priority && <span className={`px-2 py-1 text-xs font-bold text-white rounded-full ${getPriorityBadgeColor(item.priority)}`}>{item.priority}</span>} </div>
                     {typeof item.price === 'number' && <p className="font-semibold text-lg">₹{item.price.toLocaleString()}</p>}
                   </CardHeader>
