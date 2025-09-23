@@ -418,13 +418,13 @@ export default function DashboardPage() {
 
       {imageModalUrl && (
         <Dialog open={!!imageModalUrl} onOpenChange={(open) => !open && handleCloseImageModal()}>
-          <DialogContent className="w-screen h-screen max-w-none max-h-none p-4 bg-transparent border-none flex items-center justify-center">
+          <DialogContent className="max-w-[90vw] max-h-[90vh] p-4 bg-transparent border-none flex items-center justify-center">
             <Image src={imageModalUrl} alt="Wishlist Item" fill className="object-contain rounded-lg" />
             <DialogClose asChild>
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute top-4 right-4 rounded-full bg-gray-900/50 text-white hover:bg-gray-900/75"
+                className="absolute top-4 right-4 rounded-full bg-gray-900/50 text-white hover:bg-gray-900/75 z-50"
               >
                 <X className="h-8 w-8" />
               </Button>
