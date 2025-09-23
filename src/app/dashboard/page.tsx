@@ -313,7 +313,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center p-4 sm:p-8 bg-slate-50 dark:bg-slate-950">
-       <header className="w-full max-w-5xl flex justify-between items-center py-4 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 bg-slate-50 dark:bg-slate-950"><Image src="/logo.png" alt="Our Wishlist" className="h-8 w-auto" /><Button variant="ghost" size="icon" onClick={handleSignOut}><LogOut className="h-8 w-8" /></Button></header>
+       <header className="w-full max-w-5xl flex justify-between items-center py-4 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 bg-slate-50 dark:bg-slate-950"><Image src="/logo.png" alt="Our Wishlist" className="h-12 w-auto" /><Button variant="ghost" size="icon" onClick={handleSignOut}><LogOut className="h-10 w-10" /></Button></header>
        
        <main className="w-full max-w-5xl mt-8">
         <Dialog open={isDialogOpen} onOpenChange={(open) => { if (!open) resetForm(); setIsDialogOpen(open); }}>
