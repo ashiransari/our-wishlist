@@ -241,7 +241,7 @@ export default function DashboardPage() {
             const isReservedByMe = item.reservedBy === user?.uid;
             const formattedLink = item.link && !item.link.startsWith('http') ? `https://${item.link}` : item.link;
             return (
-              <Card key={item.id} className={`flex flex-col justify-between transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-lg ${isReservedByMe ? 'border-green-500 border-2' : ''} ${item.isPurchased ? 'opacity-60' : ''}`}>
+              <Card key={item.id} className={`flex flex-col justify-between transition-all duration-200 ease-in-out shadow-md hover:shadow-xl ${isReservedByMe ? 'border-green-500 border-2' : ''} ${item.isPurchased ? 'opacity-60' : ''}`}>
                 <div>
                   {item.imageUrl && <Image src={item.imageUrl} alt={item.name} width={192} height={192} className="w-full h-48 object-cover rounded-t-lg cursor-pointer" onClick={() => handleOpenImageModal(item.imageUrl!)}/>}                   <CardHeader className="pt-4">
                     <div className="flex justify-between items-start"> 
@@ -256,16 +256,16 @@ export default function DashboardPage() {
                       </CardTitle> 
                       {item.priority && <span className={`px-2 py-1 text-xs font-bold text-white rounded-full ${getPriorityBadgeColor(item.priority)}`}>{item.priority}</span>} 
                     </div>
-                    {typeof item.price === 'number' && <p className="font-semibold text-lg">₹{item.price.toLocaleString()}</p>}
+                    {typeof item.price === 'number' && <p className="font-semibold text-xl">₹{item.price.toLocaleString()}</p>}
                   </CardHeader>
                   <CardContent>
-                    {item.notes && <p className="text-sm text-gray-600 dark:text-gray-300">{item.notes}</p>}
+                    {item.notes && <p className="text-sm text-gray-500 dark:text-gray-400">{item.notes}</p>}
                     {item.isPurchased && <p className="text-xs text-green-600 mt-2 font-bold">Purchased!</p>}
                   </CardContent>
                 </div>
                 <CardFooter className="flex gap-2 bg-slate-50 dark:bg-slate-800/50 p-3 mt-auto">
                   {isMyItem && !item.isPurchased && <>
-                    <Button variant="outline" size="sm" onClick={() => handleOpenDialog(item)}>Edit</Button>
+                    <Button variant="ghost" size="sm" onClick={() => handleOpenDialog(item)}>Edit</Button>
                     <Button variant="destructive" size="sm" onClick={() => handleDeleteConfirmation(item.id)}>Delete</Button>
                   </>}
                   {!isMyItem && isReservedByMe && !item.isPurchased && <>
