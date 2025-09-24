@@ -268,7 +268,15 @@ export default function DashboardPage() {
                     <Button variant="ghost" size="sm" onClick={() => handleOpenDialog(item)} className="bg-slate-200">Edit</Button>
                     <Button variant="destructive" size="sm" onClick={() => handleDeleteConfirmation(item.id)}>Delete</Button>
                   </>}
-              </Card>
+                  {!isMyItem && isReservedByMe && !item.isPurchased && <>
+                    <Button variant="secondary" size="sm" onClick={() => handleUnreserveItem(item.id)}>Unreserve</Button>
+                    <Button size="sm" onClick={() => handleMarkAsPurchased(item.id)}>Purchased</Button>
+                  </>}
+                  {!isMyItem && !item.reservedBy && <Button size="sm" onClick={() => handleReserveItem(item.id)}>Reserve</Button>}
+                  {activeTab === 'history' && (isMyItem || isReservedByMe) &&
+                    <Button variant="ghost" size="sm" onClick={() => handleUnmarkAsPurchased(item.id)}>Revert Purchase</Button>
+                  }
+                </CardFooter>
             )
           })}
         </div>
