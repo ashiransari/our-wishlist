@@ -263,20 +263,11 @@ export default function DashboardPage() {
                     {item.isPurchased && <p className="text-xs text-green-600 mt-2 font-bold">Purchased!</p>}
                   </CardContent>
                 </div>
-                <CardFooter className="flex gap-2 bg-slate-50 dark:bg-slate-800/50 p-3 mt-auto">
+                <CardFooter className="flex gap-2 p-3 mt-auto">
                   {isMyItem && !item.isPurchased && <>
-                    <Button variant="ghost" size="sm" onClick={() => handleOpenDialog(item)}>Edit</Button>
+                    <Button variant="ghost" size="sm" onClick={() => handleOpenDialog(item)} className="bg-slate-200">Edit</Button>
                     <Button variant="destructive" size="sm" onClick={() => handleDeleteConfirmation(item.id)}>Delete</Button>
                   </>}
-                  {!isMyItem && isReservedByMe && !item.isPurchased && <>
-                    <Button variant="secondary" size="sm" onClick={() => handleUnreserveItem(item.id)}>Unreserve</Button>
-                    <Button size="sm" onClick={() => handleMarkAsPurchased(item.id)}>Purchased</Button>
-                  </>}
-                  {!isMyItem && !item.reservedBy && <Button size="sm" onClick={() => handleReserveItem(item.id)}>Reserve</Button>}
-                  {activeTab === 'history' && (isMyItem || isReservedByMe) &&
-                    <Button variant="ghost" size="sm" onClick={() => handleUnmarkAsPurchased(item.id)}>Revert Purchase</Button>
-                  }
-                </CardFooter>
               </Card>
             )
           })}
