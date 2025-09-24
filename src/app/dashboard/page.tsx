@@ -277,6 +277,7 @@ export default function DashboardPage() {
                     <Button variant="ghost" size="sm" onClick={() => handleUnmarkAsPurchased(item.id)}>Revert Purchase</Button>
                   }
                 </CardFooter>
+              </Card>
             )
           })}
         </div>
