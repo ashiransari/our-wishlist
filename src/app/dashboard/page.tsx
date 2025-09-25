@@ -13,6 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { auth, db } from '../../lib/firebase/config';
+import { requestPermission } from '@/lib/firebase/messaging';
 import { signOut, User } from 'firebase/auth';
 import { collection, addDoc, query, where, onSnapshot, doc, deleteDoc, getDoc, updateDoc, Timestamp } from "firebase/firestore";
 
@@ -35,6 +36,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [myName, setMyName] = useState("Me");
   const [partnerName, setPartnerName] = useState("Partner");
+  const [partnerId, setPartnerId] = useState<string | null>(null);
   const [myItems, setMyItems] = useState<WishlistItem[]>([]);
   const [partnerItems, setPartnerItems] = useState<WishlistItem[]>([]);
   const [occasions, setOccasions] = useState<Occasion[]>([]);
@@ -66,6 +68,9 @@ export default function DashboardPage() {
   useEffect(() => {
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       setUser(user);
+      if (user) {
+        requestPermission();
+      }
       if (!user) setLoading(false);
     });
     return () => unsubscribeAuth();
@@ -81,6 +86,7 @@ export default function DashboardPage() {
         const userDocSnap = await getDoc(userDocRef);
         if (userDocSnap.exists()) setMyName(userDocSnap.data().name || "Me");
         const partnerId = userDocSnap.exists() ? userDocSnap.data().partnerId : null;
+        setPartnerId(partnerId);
         if (partnerId) {
           const partnerDocRef = doc(db, "users", partnerId);
           const partnerDocSnap = await getDoc(partnerDocRef);
@@ -195,6 +201,19 @@ export default function DashboardPage() {
           await updateDoc(doc(db, "wishlist", editingItem.id), itemData);
         } else {
           await addDoc(collection(db, "wishlist"), { ...itemData, authorId: user.uid, createdAt: new Date() });
+          if (partnerId) {
+            await fetch("/api/send-notification", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                partnerId,
+                title: `${myName} added a new item!`,
+                message: itemName,
+              }),
+            });
+          }
         }
         resetForm();
         resolve();
