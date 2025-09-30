@@ -22,7 +22,7 @@ import Image from 'next/image';
 import { Plus, ChevronsUpDown, X, LogOut, CalendarDays } from 'lucide-react';
 
 type WishlistItem = {
-  id: string; name: string; price?: number; minPrice?: number; maxPrice?: number; link?: string; notes?: string; authorId: string;
+  id: string; name: string; price?: number | null; minPrice?: number | null; maxPrice?: number | null; link?: string; notes?: string; authorId: string;
   reservedBy?: string; reservedByName?: string; priority: 'P1' | 'P2' | 'P3';
   imageUrl?: string; createdAt: Timestamp; isPurchased?: boolean; occasionId?: string;
 };
@@ -227,7 +227,17 @@ export default function DashboardPage() {
           else { throw new Error("Cloudinary upload failed."); }
         }
         
-        const itemData: any = { 
+        const itemData: {
+          name: string;
+          link: string;
+          notes: string;
+          priority: "P1" | "P2" | "P3";
+          imageUrl: string;
+          occasionId: string;
+          price?: number | null;
+          minPrice?: number | null;
+          maxPrice?: number | null;
+        } = { 
           name: itemName, 
           link: itemLink, 
           notes: itemNotes, 
