@@ -19,7 +19,7 @@ import { collection, addDoc, query, where, onSnapshot, doc, deleteDoc, getDoc, u
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Plus, ChevronsUpDown, X, LogOut } from 'lucide-react';
+import { Plus, ChevronsUpDown, X, LogOut, CalendarDays } from 'lucide-react';
 
 // Type Definitions
 type WishlistItem = {
@@ -276,10 +276,14 @@ export default function DashboardPage() {
                       {item.priority && <span className={`px-2 py-1 text-xs font-bold text-white rounded-full ${getPriorityBadgeColor(item.priority)}`}>{item.priority}</span>} 
                     </div>
                     {typeof item.price === 'number' && <p className="font-semibold text-xl">₹{item.price.toLocaleString()}</p>}
-                    {item.createdAt && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Added on {item.createdAt.toDate().toLocaleDateString()}</p>}
                   </CardHeader>
                   <CardContent>
                     {item.notes && <p className="text-sm text-gray-500 dark:text-gray-400">{item.notes}</p>}
+                    {item.createdAt && 
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 flex items-center">
+                        <CalendarDays className="h-4 w-4 mr-1.5" />
+                        {item.createdAt.toDate().toLocaleDateString()}
+                      </p>}
                     {item.isPurchased && <p className="text-xs text-green-600 mt-2 font-bold">Purchased!</p>}
                   </CardContent>
                 </div>
