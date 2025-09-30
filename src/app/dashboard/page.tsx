@@ -21,15 +21,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Plus, ChevronsUpDown, X, LogOut, CalendarDays } from 'lucide-react';
 
-// Type Definitions
 type WishlistItem = {
-  id: string; name: string; price: number; link?: string; notes?: string; authorId: string;
+  id: string; name: string; price?: number; minPrice?: number; maxPrice?: number; link?: string; notes?: string; authorId: string;
   reservedBy?: string; reservedByName?: string; priority: 'P1' | 'P2' | 'P3';
   imageUrl?: string; createdAt: Timestamp; isPurchased?: boolean; occasionId?: string;
 };
+
 type Occasion = { id: string; name: string; };
 type SortOption = 'newest' | 'oldest' | 'priceHigh' | 'priceLow' | 'priority';
 type FilterOption = 'all' | 'P1' | 'P2' | 'P3';
+type PriceType = 'exact' | 'range' | 'unknown';
 
 export default function DashboardPage() {
   // State Hooks
@@ -46,6 +47,9 @@ export default function DashboardPage() {
   const [editingItem, setEditingItem] = useState<WishlistItem | null>(null);
   const [itemName, setItemName] = useState('');
   const [itemPrice, setItemPrice] = useState('');
+  const [minPrice, setMinPrice] = useState('');
+  const [maxPrice, setMaxPrice] = useState('');
+  const [priceType, setPriceType] = useState<PriceType>('exact');
   const [itemLink, setItemLink] = useState('');
   const [itemNotes, setItemNotes] = useState('');
   const [priority, setPriority] = useState<'P1' | 'P2' | 'P3'>('P2');
@@ -137,7 +141,21 @@ export default function DashboardPage() {
     };
   }, [myItems, partnerItems, user]);
 
-  const reservedTotal = useMemo(() => reservedByMeItems.reduce((sum, item) => sum + (item.price || 0), 0), [reservedByMeItems]);
+  const reservedTotal = useMemo(() => {
+    return reservedByMeItems.reduce((acc, item) => {
+        if (item.price) {
+            acc.min += item.price;
+            acc.max += item.price;
+        } else if (item.minPrice && item.maxPrice) {
+            acc.min += item.minPrice;
+            acc.max += item.maxPrice;
+        } else if (item.minPrice) {
+            acc.min += item.minPrice;
+            acc.max += item.minPrice; // Or some other logic for max when only min is present
+        }
+        return acc;
+    }, { min: 0, max: 0 });
+  }, [reservedByMeItems]);
 
   const displayedItems = useMemo(() => {
     let itemsToProcess: WishlistItem[] = [];
@@ -153,8 +171,8 @@ export default function DashboardPage() {
     return [...priorityFiltered].sort((a, b) => {
       switch (sortBy) {
         case 'oldest': return (a.createdAt?.toMillis() || 0) - (b.createdAt?.toMillis() || 0);
-        case 'priceHigh': return (b.price || 0) - (a.price || 0);
-        case 'priceLow': return (a.price || 0) - (b.price || 0);
+        case 'priceHigh': return (b.price || b.maxPrice || 0) - (a.price || a.maxPrice || 0);
+        case 'priceLow': return (a.price || a.minPrice || 0) - (b.price || b.minPrice || 0);
         case 'priority': return (a.priority || 'P3').localeCompare(b.priority || 'P3');
         default: return (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0);
       }
@@ -162,15 +180,24 @@ export default function DashboardPage() {
   }, [activeTab, myCurrentItems, partnerCurrentItems, reservedByMeItems, giftHistoryItems, filterBy, sortBy, filterByOccasion, allCurrentItems]);
   
   const resetForm = () => {
-    setItemName(''); setItemPrice(''); setItemLink(''); setItemNotes(''); setPriority('P2'); 
-    setImageFile(null); setEditingItem(null); setOccasionId('none');
+    setItemName(''); setItemPrice(''); setMinPrice(''); setMaxPrice(''); setItemLink(''); setItemNotes(''); setPriority('P2'); 
+    setImageFile(null); setEditingItem(null); setOccasionId('none'); setPriceType('exact');
   };
 
   const handleOpenDialog = (item: WishlistItem | null = null) => {
     if (item) {
       setEditingItem(item);
       setItemName(item.name);
-      setItemPrice(item.price ? item.price.toString() : '');
+      if (item.price) {
+        setPriceType('exact');
+        setItemPrice(item.price.toString());
+      } else if (item.minPrice && item.maxPrice) {
+        setPriceType('range');
+        setMinPrice(item.minPrice.toString());
+        setMaxPrice(item.maxPrice.toString());
+      } else {
+        setPriceType('unknown');
+      }
       setItemLink(item.link || '');
       setItemNotes(item.notes || '');
       setPriority(item.priority);
@@ -182,7 +209,10 @@ export default function DashboardPage() {
   };
   
   const handleFormSubmit = async () => {
-    if (!user || !itemName || !itemPrice || !priority) return toast.error("Please fill in Name, Price, and Priority.");
+    if (!user || !itemName || !priority) return toast.error("Please fill in Name and Priority.");
+    if (priceType === 'exact' && !itemPrice) return toast.error("Please fill in the Price.");
+    if (priceType === 'range' && (!minPrice || !maxPrice)) return toast.error("Please fill in the Price Range.");
+
     setIsUploading(true);
     const promise = new Promise<void>(async (resolve, reject) => {
       try {
@@ -196,7 +226,30 @@ export default function DashboardPage() {
           if (data.secure_url) { imageUrl = data.secure_url; } 
           else { throw new Error("Cloudinary upload failed."); }
         }
-        const itemData = { name: itemName, price: parseFloat(itemPrice), link: itemLink, notes: itemNotes, priority: priority, imageUrl: imageUrl, occasionId: occasionId === 'none' ? '' : occasionId };
+        
+        const itemData: any = { 
+          name: itemName, 
+          link: itemLink, 
+          notes: itemNotes, 
+          priority: priority, 
+          imageUrl: imageUrl, 
+          occasionId: occasionId === 'none' ? '' : occasionId 
+        };
+
+        if (priceType === 'exact') {
+          itemData.price = parseFloat(itemPrice);
+          itemData.minPrice = null;
+          itemData.maxPrice = null;
+        } else if (priceType === 'range') {
+          itemData.price = null;
+          itemData.minPrice = parseFloat(minPrice);
+          itemData.maxPrice = parseFloat(maxPrice);
+        } else {
+          itemData.price = null;
+          itemData.minPrice = null;
+          itemData.maxPrice = null;
+        }
+
         if (editingItem) {
           await updateDoc(doc(db, "wishlist", editingItem.id), itemData);
         } else {
@@ -275,7 +328,8 @@ export default function DashboardPage() {
                       </CardTitle> 
                       {item.priority && <span className={`px-2 py-1 text-xs font-bold text-white rounded-full ${getPriorityBadgeColor(item.priority)}`}>{item.priority}</span>} 
                     </div>
-                    {typeof item.price === 'number' && <p className="font-semibold text-xl">₹{item.price.toLocaleString()}</p>}
+                    {item.price && <p className="font-semibold text-xl">₹{item.price.toLocaleString()}</p>}
+                    {item.minPrice && item.maxPrice && <p className="font-semibold text-xl">₹{item.minPrice.toLocaleString()} - ₹{item.maxPrice.toLocaleString()}</p>}
                   </CardHeader>
                   <CardContent>
                     {item.notes && <p className="text-sm text-gray-500 dark:text-gray-400">{item.notes}</p>}
@@ -327,7 +381,7 @@ export default function DashboardPage() {
     if (activeTab === 'reserved') {
       return (
         <>
-          <div className="pt-4 font-semibold text-lg">Total Reserved Budget: ₹{reservedTotal.toLocaleString()}</div>
+          <div className="pt-4 font-semibold text-lg">Total Reserved Budget: ₹{reservedTotal.min.toLocaleString()} - ₹{reservedTotal.max.toLocaleString()}</div>
           {renderWishlist(displayedItems)}
         </>
       );
@@ -423,7 +477,24 @@ export default function DashboardPage() {
               <DialogHeader><DialogTitle>{editingItem ? editItemTitle : addItemTitle}</DialogTitle></DialogHeader>
               <div className="grid gap-4 py-4">
                 <div><Label>Name*</Label><Input value={itemName} onChange={(e) => setItemName(e.target.value)} placeholder="Item Name"/></div>
-                <div><Label>Price (₹)*</Label><Input value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} type="number" placeholder="e.g., 1500"/></div>
+                <div>
+                  <Label>Price (₹)</Label>
+                  <Select value={priceType} onValueChange={(value) => setPriceType(value as PriceType)}>
+                    <SelectTrigger><SelectValue/></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="exact">Exact Price</SelectItem>
+                      <SelectItem value="range">Price Range</SelectItem>
+                      <SelectItem value="unknown">Price Not Known</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                {priceType === 'exact' && <div><Input value={itemPrice} onChange={(e) => setItemPrice(e.target.value)} type="number" placeholder="e.g., 1500"/></div>}
+                {priceType === 'range' && 
+                  <div className="grid grid-cols-2 gap-2">
+                    <Input value={minPrice} onChange={(e) => setMinPrice(e.target.value)} type="number" placeholder="Min"/>
+                    <Input value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} type="number" placeholder="Max"/>
+                  </div>
+                }
                 <div><Label>Link (Optional)</Label><Input value={itemLink} onChange={(e) => setItemLink(e.target.value)} placeholder="https://..."/></div>
                 <div><Label>Notes (Optional)</Label><Textarea value={itemNotes} onChange={(e) => setItemNotes(e.target.value)} placeholder="e.g., Size M, Blue color"/></div>
                 <div><Label>Priority*</Label><Select value={priority} onValueChange={(value) => setPriority(value as 'P1'|'P2'|'P3')}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="P1">P1 - Must Have</SelectItem><SelectItem value="P2">P2 - Would Be Nice</SelectItem><SelectItem value="P3">P3 - If You Can</SelectItem></SelectContent></Select></div>
