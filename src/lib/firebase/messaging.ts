@@ -10,14 +10,18 @@ export const requestPermission = async () => {
         return;
     }
 
-    const messaging = getMessaging(app);
-    const permission = await Notification.requestPermission();
+    try {
+        const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+        console.log('Service Worker registration successful with scope: ', registration.scope);
 
-    if (permission === "granted") {
-        console.log("Notification permission granted.");
-        try {
+        const messaging = getMessaging(app);
+        const permission = await Notification.requestPermission();
+
+        if (permission === "granted") {
+            console.log("Notification permission granted.");
             const token = await getToken(messaging, {
                 vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
+                serviceWorkerRegistration: registration,
             });
 
             if (token) {
@@ -33,10 +37,10 @@ export const requestPermission = async () => {
             } else {
                 console.log("No registration token available. Request permission to generate one.");
             }
-        } catch (error) {
-            console.error("An error occurred while retrieving token. ", error);
+        } else {
+            console.log("Unable to get permission to notify.");
         }
-    } else {
-        console.log("Unable to get permission to notify.");
+    } catch (error) {
+        console.error("An error occurred during service worker registration or token retrieval. ", error);
     }
 };

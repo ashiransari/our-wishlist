@@ -276,6 +276,7 @@ export default function DashboardPage() {
                       {item.priority && <span className={`px-2 py-1 text-xs font-bold text-white rounded-full ${getPriorityBadgeColor(item.priority)}`}>{item.priority}</span>} 
                     </div>
                     {typeof item.price === 'number' && <p className="font-semibold text-xl">₹{item.price.toLocaleString()}</p>}
+                    {item.createdAt && <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Added on {item.createdAt.toDate().toLocaleDateString()}</p>}
                   </CardHeader>
                   <CardContent>
                     {item.notes && <p className="text-sm text-gray-500 dark:text-gray-400">{item.notes}</p>}
@@ -332,7 +333,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center p-4 sm:p-8 bg-slate-50 dark:bg-slate-950">
-       <header className="w-full max-w-5xl flex justify-between items-center py-4 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 bg-slate-50 dark:bg-slate-950"><Image src="/logo.png" alt="Our Wishlist" className="h-12 w-auto" /><Button variant="ghost" size="icon" onClick={handleSignOut}><LogOut className="h-10 w-10" /></Button></header>
+       <header className="w-full max-w-5xl flex justify-between items-center py-4 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 bg-slate-50 dark:bg-slate-950"><Image src="/logo.png" alt="Our Wishlist" width={150} height={48} className="h-12 w-auto" /><Button variant="ghost" size="icon" onClick={handleSignOut}><LogOut className="h-10 w-10" /></Button></header>
        
        <main className="w-full max-w-5xl mt-8">
         <Dialog open={isDialogOpen} onOpenChange={(open) => { if (!open) resetForm(); setIsDialogOpen(open); }}>
