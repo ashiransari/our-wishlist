@@ -492,9 +492,9 @@ export default function DashboardPage() {
           <DialogContent>
               <DialogHeader><DialogTitle>{editingItem ? editItemTitle : addItemTitle}</DialogTitle></DialogHeader>
               <div className="grid gap-4 py-4">
-                <div><Label>Name*</Label><Input value={itemName} onChange={(e) => setItemName(e.target.value)} placeholder="Item Name"/></div>
+                <div><Label className="mb-2">Name*</Label><Input value={itemName} onChange={(e) => setItemName(e.target.value)} placeholder="Item Name"/></div>
                 <div>
-                  <Label>Price (₹)</Label>
+                  <Label className="mb-2">Price (₹)</Label>
                   <Select value={priceType} onValueChange={(value) => setPriceType(value as PriceType)}>
                     <SelectTrigger><SelectValue/></SelectTrigger>
                     <SelectContent>
@@ -511,11 +511,11 @@ export default function DashboardPage() {
                     <Input value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} type="number" placeholder="Max"/>
                   </div>
                 }
-                <div><Label>Link (Optional)</Label><Input value={itemLink} onChange={(e) => setItemLink(e.target.value)} placeholder="https://..."/></div>
-                <div><Label>Notes (Optional)</Label><Textarea value={itemNotes} onChange={(e) => setItemNotes(e.target.value)} placeholder="e.g., Size M, Blue color"/></div>
-                <div><Label>Priority*</Label><Select value={priority} onValueChange={(value) => setPriority(value as 'P1'|'P2'|'P3')}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="P1">P1 - Must Have</SelectItem><SelectItem value="P2">P2 - Would Be Nice</SelectItem><SelectItem value="P3">P3 - If You Can</SelectItem></SelectContent></Select></div>
-                <div><Label>Occasion (Optional)</Label><Select value={occasionId} onValueChange={setOccasionId}><SelectTrigger><SelectValue placeholder="Assign to an occasion" /></SelectTrigger><SelectContent><SelectItem value="none">None</SelectItem>{occasions.map(occ => <SelectItem key={occ.id} value={occ.id}>{occ.name}</SelectItem>)}</SelectContent></Select></div>
-                <div><Label>Image (Optional)</Label><Input type="file" accept="image/*" onChange={(e) => e.target.files && setImageFile(e.target.files[0])} className="pt-1.5"/></div>
+                <div><Label className="mb-2">Link (Optional)</Label><Input value={itemLink} onChange={(e) => setItemLink(e.target.value)} placeholder="https://..."/></div>
+                <div><Label className="mb-2">Notes (Optional)</Label><Textarea value={itemNotes} onChange={(e) => setItemNotes(e.target.value)} placeholder="e.g., Size M, Blue color"/></div>
+                <div><Label className="mb-2">Priority*</Label><Select value={priority} onValueChange={(value) => setPriority(value as 'P1'|'P2'|'P3')}><SelectTrigger><SelectValue/></SelectTrigger><SelectContent><SelectItem value="P1">P1 - Must Have</SelectItem><SelectItem value="P2">P2 - Would Be Nice</SelectItem><SelectItem value="P3">P3 - If You Can</SelectItem></SelectContent></Select></div>
+                <div><Label className="mb-2">Occasion (Optional)</Label><Select value={occasionId} onValueChange={setOccasionId}><SelectTrigger><SelectValue placeholder="Assign to an occasion" /></SelectTrigger><SelectContent><SelectItem value="none">None</SelectItem>{occasions.map(occ => <SelectItem key={occ.id} value={occ.id}>{occ.name}</SelectItem>)}</SelectContent></Select></div>
+                <div><Label className="mb-2">Image (Optional)</Label><Input type="file" accept="image/*" onChange={(e) => e.target.files && setImageFile(e.target.files[0])} className="pt-1.5"/></div>
               </div>
               <DialogFooter><Button onClick={handleFormSubmit} disabled={isUploading}>{isUploading ? 'Saving...' : 'Save changes'}</Button></DialogFooter>
           </DialogContent>

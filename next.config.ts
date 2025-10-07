@@ -18,6 +18,6 @@ const nextConfig: NextConfig = {
     dest: "public",
     register: true,
     skipWaiting: true,
-  // @ts-ignore
+  // @ts-expect-error PWA type issue
   })(nextConfig);
 
