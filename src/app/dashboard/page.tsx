@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { auth, db } from '../../lib/firebase/config';
 import { requestPermission } from '@/lib/firebase/messaging';
@@ -403,16 +403,18 @@ export default function DashboardPage() {
     }
     if (activeTab === 'history') {
         return (
-          <>
-            <div className="pt-4">
-              <h2 className="text-2xl font-bold mb-4">Gifts Given</h2>
-              {renderWishlist(giftsGiven)}
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold mb-4 pt-4">Gifts Received</h2>
-              {renderWishlist(giftsReceived)}
-            </div>
-          </>
+            <Tabs defaultValue="given" className="pt-4">
+                <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="given">Gifts Given</TabsTrigger>
+                    <TabsTrigger value="received">Gifts Received</TabsTrigger>
+                </TabsList>
+                <TabsContent value="given">
+                    {renderWishlist(giftsGiven)}
+                </TabsContent>
+                <TabsContent value="received">
+                    {renderWishlist(giftsReceived)}
+                </TabsContent>
+            </Tabs>
         );
       }
     return renderWishlist(displayedItems);
@@ -473,7 +475,7 @@ export default function DashboardPage() {
               {/* Mobile View: Dropdown */}
               <div className="md:hidden mb-4">
                 <Select value={activeTab} onValueChange={setActiveTab}>
-                  <SelectTrigger>
+                  <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a view" />
                   </SelectTrigger>
                   <SelectContent>
