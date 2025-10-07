@@ -117,7 +117,7 @@ export default function DashboardPage() {
   }, [user]);
 
   // Derived State for Tabs (This is the corrected logic for the surprise)
-  const { myCurrentItems, partnerCurrentItems, reservedByMeItems, giftHistoryItems, allCurrentItems } = useMemo(() => {
+  const { myCurrentItems, partnerCurrentItems, reservedByMeItems, allCurrentItems, giftsGiven, giftsReceived } = useMemo(() => {
     const myUnpurchased = myItems.filter(item => !item.isPurchased);
     const partnerUnpurchased = partnerItems.filter(item => !item.isPurchased);
     
@@ -130,14 +130,16 @@ export default function DashboardPage() {
     // Items I have reserved from my partner's list.
     const reservedByMe = partnerUnpurchased.filter(item => item.reservedBy === user?.uid);
 
-    const giftHistory = [...myItems, ...partnerItems].filter(item => item.isPurchased && (item.authorId === user?.uid || item.reservedBy === user?.uid));
+    const giftsGiven = partnerItems.filter(item => item.isPurchased && item.reservedBy === user?.uid);
+    const giftsReceived = myItems.filter(item => item.isPurchased);
     
     return { 
         myCurrentItems: myVisibleItems, 
         partnerCurrentItems: partnerVisibleItems, 
         reservedByMeItems: reservedByMe, 
-        giftHistoryItems: giftHistory,
-        allCurrentItems: [...myVisibleItems, ...partnerVisibleItems]
+        allCurrentItems: [...myVisibleItems, ...partnerVisibleItems],
+        giftsGiven,
+        giftsReceived
     };
   }, [myItems, partnerItems, user]);
 
@@ -162,7 +164,6 @@ export default function DashboardPage() {
     if (activeTab === 'my-wishlist') itemsToProcess = myCurrentItems;
     else if (activeTab === 'partner-wishlist') itemsToProcess = partnerCurrentItems;
     else if (activeTab === 'reserved') itemsToProcess = reservedByMeItems;
-    else if (activeTab === 'history') itemsToProcess = giftHistoryItems;
     else if (activeTab === 'all') itemsToProcess = allCurrentItems;
     
     const occasionFiltered = filterByOccasion !== 'all' ? itemsToProcess.filter(item => item.occasionId === filterByOccasion) : itemsToProcess;
@@ -177,7 +178,7 @@ export default function DashboardPage() {
         default: return (b.createdAt?.toMillis() || 0) - (a.createdAt?.toMillis() || 0);
       }
     });
-  }, [activeTab, myCurrentItems, partnerCurrentItems, reservedByMeItems, giftHistoryItems, filterBy, sortBy, filterByOccasion, allCurrentItems]);
+  }, [activeTab, myCurrentItems, partnerCurrentItems, reservedByMeItems, filterBy, sortBy, filterByOccasion, allCurrentItems]);
   
   const resetForm = () => {
     setItemName(''); setItemPrice(''); setMinPrice(''); setMaxPrice(''); setItemLink(''); setItemNotes(''); setPriority('P2'); 
@@ -323,7 +324,12 @@ export default function DashboardPage() {
             const isReservedByMe = item.reservedBy === user?.uid;
             const formattedLink = item.link && !item.link.startsWith('http') ? `https://${item.link}` : item.link;
             return (
-              <Card key={item.id} className={`flex flex-col justify-between transition-all duration-200 ease-in-out shadow-md hover:shadow-xl ${isReservedByMe ? 'border-green-500 border-2' : ''} ${item.isPurchased ? 'opacity-60' : ''}`}>
+              <Card key={item.id} className={`relative flex flex-col justify-between transition-all duration-200 ease-in-out shadow-md hover:shadow-xl ${isReservedByMe ? 'border-green-500 border-2' : ''}`}>
+                {item.isPurchased && (
+                  <div className="absolute inset-0 bg-black/40 rounded-lg flex items-center justify-center z-10">
+                    <span className="text-white text-2xl font-bold flex items-center">✅ Purchased</span>
+                  </div>
+                )}
                 <div>
                   {item.imageUrl && <Image src={item.imageUrl} alt={item.name} width={192} height={192} className="w-full h-48 object-cover rounded-t-lg cursor-pointer" onClick={() => handleOpenImageModal(item.imageUrl!)}/>}                   <CardHeader className="pt-4">
                     <div className="flex justify-between items-start"> 
@@ -348,7 +354,6 @@ export default function DashboardPage() {
                         <CalendarDays className="h-4 w-4 mr-1.5" />
                         {item.createdAt.toDate().toLocaleDateString()}
                       </p>}
-                    {item.isPurchased && <p className="text-xs text-green-600 mt-2 font-bold">Purchased!</p>}
                   </CardContent>
                 </div>
                 <CardFooter className="flex gap-2 p-3 mt-auto">
@@ -362,7 +367,7 @@ export default function DashboardPage() {
                   </>}
                   {!isMyItem && !item.reservedBy && <Button size="sm" onClick={() => handleReserveItem(item.id)}>Reserve</Button>}
                   {activeTab === 'history' && (isMyItem || isReservedByMe) &&
-                    <Button variant="ghost" size="sm" onClick={() => handleUnmarkAsPurchased(item.id)}>Revert Purchase</Button>
+                    <Button variant="outline" size="sm" onClick={() => handleUnmarkAsPurchased(item.id)}>Revert Purchase</Button>
                   }
                 </CardFooter>
               </Card>
@@ -396,6 +401,20 @@ export default function DashboardPage() {
         </>
       );
     }
+    if (activeTab === 'history') {
+        return (
+          <>
+            <div className="pt-4">
+              <h2 className="text-2xl font-bold mb-4">Gifts Given</h2>
+              {renderWishlist(giftsGiven)}
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold mb-4 pt-4">Gifts Received</h2>
+              {renderWishlist(giftsReceived)}
+            </div>
+          </>
+        );
+      }
     return renderWishlist(displayedItems);
   };
 
@@ -416,7 +435,7 @@ export default function DashboardPage() {
           <div className="md:hidden mb-4">
             <Collapsible open={isFilterOpen} onOpenChange={setIsFilterOpen} className="w-full">
               <div className="flex items-center justify-between">
-                <Button asChild variant="secondary"><Link href="/occasions">Manage Occasions</Link></Button>
+                <Button asChild variant="outline"><Link href="/occasions">Manage Occasions</Link></Button>
                 <CollapsibleTrigger asChild>
                   <Button variant="outline" size="sm" className="w-36">
                     <ChevronsUpDown className="h-4 w-4 mr-2" />
@@ -442,7 +461,7 @@ export default function DashboardPage() {
               <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}><SelectTrigger className="w-full sm:w-[180px]"><SelectValue placeholder="Sort by" /></SelectTrigger><SelectContent><SelectItem value="newest">Newest First</SelectItem><SelectItem value="oldest">Oldest First</SelectItem><SelectItem value="priceHigh">Price: High to Low</SelectItem><SelectItem value="priceLow">Price: Low to High</SelectItem><SelectItem value="priority">Priority</SelectItem></SelectContent></Select>
             </div>
             <div className="flex gap-2">
-                <Button asChild variant="secondary"><Link href="/occasions">Manage Occasions</Link></Button>
+                <Button asChild variant="outline"><Link href="/occasions">Manage Occasions</Link></Button>
                 <DialogTrigger asChild>
                   <Button onClick={() => handleOpenDialog()}>Add New Item</Button>
                 </DialogTrigger>
