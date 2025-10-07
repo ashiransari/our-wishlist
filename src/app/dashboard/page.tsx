@@ -425,7 +425,7 @@ export default function DashboardPage() {
        <header className="w-full max-w-5xl flex justify-between items-center py-4 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 bg-slate-50 dark:bg-slate-950">
         <div className="flex items-center">
           <Image src="/logo.png" alt="Our Wishlist" width={48} height={48} className="h-12 w-auto" />
-          <Image src="/BabyWish.png" alt="BabyWish" width={100} height={48} className="ml-2" />
+          <Image src="/BabyWish.png" alt="BabyWish" width={100} height={48} className="ml-2 h-8 w-auto" />
         </div>
         <Button variant="ghost" size="icon" onClick={handleSignOut}><LogOut className="h-10 w-10" /></Button>
       </header>
