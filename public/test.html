@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>FCM Push Test</title>
+</head>
+<body>
+  <h1>Firebase Push Notification Test</h1>
+  <p>Check the console for messages...</p>
+
+  <script type="module">
+    // Make sure you are using the correct paths to the Firebase SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-messaging.js";
+
+    // IMPORTANT: REPLACE WITH YOUR FIREBASE CONFIG
+    const firebaseConfig = {
+      apiKey: "AIzaSyAsh0Zulju4OHP_mws_4LqilWXQIKgDbhs",
+      authDomain: "our-wishlist-a3c6a.firebaseapp.com",
+      projectId: "our-wishlist-a3c6a",
+      storageBucket: "our-wishlist-a3c6a.firebasestorage.app",
+      messagingSenderId: "723816178644",
+      appId: "1:723816178644:web:c54dd8ff0844032d372c41"
+    };
+
+    // IMPORTANT: REPLACE WITH YOUR VAPID KEY
+    const vapidKey = "BI15acWKCnDBCQ-ANb-n3g76rXmQ81hOGmlur3OcCSLHrAENfEkUmsNCGmWXxLSQJI73t673jFBH-w00wvGyY_U";
+
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+
+    async function requestPermission() {
+      console.log('Requesting permission...');
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          console.log('Notification permission granted.');
+          console.log('Attempting to get token with VAPID key:', vapidKey);
+
+          const token = await getToken(messaging, {
+            vapidKey: vapidKey,
+          });
+
+          if (token) {
+            console.log('SUCCESS! FCM Token:', token);
+            document.body.innerHTML += `<p><b>SUCCESS! Token:</b> ${token}</p>`;
+          } else {
+            console.log('Failed to get token. No registration token is available. Request permission to generate one.');
+          }
+        } else {
+          console.log('Unable to get permission to notify.');
+        }
+      } catch (err) {
+        console.error('An error occurred while retrieving token. ', err);
+        document.body.innerHTML += `<p style="color: red;"><b>ERROR:</b> ${err.message}</p>`;
+      }
+    }
+
+    requestPermission();
+  </script>
+</body>
+</html>
